@@ -24,7 +24,7 @@ jobs:
 
     - name: Build macOS .app bundle
       run: |
-        pyinstaller --windowed your_script.py
+        pyinstaller --windowed createPNG.py
         ls -l dist/  # List contents of dist/ to check for your_script.app
 
     - name: Install create-dmg
