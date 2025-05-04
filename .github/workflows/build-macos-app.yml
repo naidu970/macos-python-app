@@ -1,7 +1,7 @@
 name: Build macOS App
 
 on:
-  workflow_dispatch:  # allows manual trigger from GitHub
+  workflow_dispatch:  # allows manual trigger
 
 jobs:
   build-macos:
@@ -22,12 +22,17 @@ jobs:
         pip install pyinstaller
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Build macOS .app
+    - name: Build macOS .app bundle
       run: |
-        pyinstaller --windowed --onefile createPNG.py
+        pyinstaller --windowed createPNG.py
 
-    - name: Upload built app
+    - name: Zip the .app bundle
+      run: |
+        cd dist
+        zip -r your_script.app.zip your_script.app
+
+    - name: Upload zipped .app
       uses: actions/upload-artifact@v4
       with:
         name: macos-app
-        path: dist/
+        path: dist/your_script.app.zip
