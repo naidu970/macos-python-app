@@ -1,11 +1,11 @@
-name: Build macOS App for Big Sur 11.0.1
+name: Build macOS App
 
 on:
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:
 
 jobs:
   build-macos:
-    runs-on: macos-latest  # This will run on a macOS virtual machine, generally macOS 11.x
+    runs-on: macos-latest
 
     steps:
     - name: Checkout repository
@@ -22,26 +22,12 @@ jobs:
         pip install pyinstaller
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Set up macOS Big Sur SDK environment
+    - name: Build macOS .app
       run: |
-        # Specify the SDK for macOS Big Sur 11.0.1 (Xcode tools typically set it automatically)
-        export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
-        export MACOSX_DEPLOYMENT_TARGET=11.0  # Specify macOS Big Sur SDK
-        echo "SDKROOT is set to $SDKROOT"
-        echo "MACOSX_DEPLOYMENT_TARGET is set to $MACOSX_DEPLOYMENT_TARGET"
-
-    - name: Build macOS .app with PyInstaller
-      run: |
-        pyinstaller --windowed --onefile createPNG.py
-        ls -l dist/  # Optional: List contents of the dist folder for debugging
-
-    - name: Codesign .app (optional, for macOS Big Sur compatibility)
-      run: |
-        # Optional step to code sign the app for macOS (use if required)
-        codesign --deep --force --verify --sign "Developer ID Application: YOUR_ID" dist/createPNG.app
+        pyinstaller --windowed --onefile your_script.py
 
     - name: Upload built app
       uses: actions/upload-artifact@v4
       with:
         name: macos-app
-        path: dist/createPNG.app  # Upload the generated .app from the dist folder
+        path: dist/
