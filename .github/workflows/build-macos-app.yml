@@ -1,7 +1,7 @@
-name: Build macOS App
+name: Build macOS App with DMG
 
 on:
-  workflow_dispatch:  # allows manual trigger
+  workflow_dispatch:  # manual trigger
 
 jobs:
   build-macos:
@@ -16,7 +16,7 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install dependencies
+    - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller
@@ -24,15 +24,29 @@ jobs:
 
     - name: Build macOS .app bundle
       run: |
-        pyinstaller --windowed createPNG.py
+        pyinstaller --windowed your_script.py
+        ls -l dist/  # List contents of dist/ to check for your_script.app
 
-    - name: Zip the .app bundle
+    - name: Install create-dmg
       run: |
-        cd dist
-        zip -r your_script.app.zip your_script.app
+        brew install create-dmg
 
-    - name: Upload zipped .app
+    - name: Create DMG from .app
+      run: |
+        mkdir dist/dmg_output
+        create-dmg \
+          --volname "MyApp Installer" \
+          --window-pos 200 120 \
+          --window-size 500 300 \
+          --icon-size 100 \
+          --icon "your_script.app" 125 150 \
+          --hide-extension "your_script.app" \
+          --app-drop-link 375 150 \
+          "dist/your_script.app" \
+          "dist/dmg_output"
+
+    - name: Upload DMG
       uses: actions/upload-artifact@v4
       with:
-        name: macos-app
-        path: dist/your_script.app.zip
+        name: macos-dmg
+        path: dist/dmg_output/*.dmg
